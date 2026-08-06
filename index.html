@@ -150,8 +150,6 @@ button{
 
 <script>
 
-<script>
-
 function playCorrectSound() {
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -305,8 +303,7 @@ function judge(){
 
   score++;
 
-  seikaiSound.currentTime=0;
-  seikaiSound.play();
+  playCorrectSound();
 
   drawStars();
 

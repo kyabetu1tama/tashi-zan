@@ -1,0 +1,128 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>たしざんチャレンジ Ver.3</title>
+<style>
+body{font-family:sans-serif;background:#eef9ff;margin:0;display:flex;justify-content:center}
+.main{width:min(760px,100vw);padding:12px}
+.card{background:white;border-radius:16px;padding:14px;box-shadow:0 2px 8px #bbb}
+.top{display:flex;justify-content:space-between;font-size:24px;font-weight:bold}
+#stars{font-size:28px;line-height:1.2;min-height:70px;white-space:pre-line;text-align:center}
+#problem{font-size:50px;text-align:center;margin:8px}
+#answer{width:140px;height:50px;border:3px solid #4caf50;border-radius:8px;margin:8px auto;text-align:center;font-size:38px;line-height:50px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:540px;margin:auto}
+button{padding:14px;font-size:28px;border:none;border-radius:10px;background:#42a5f5;color:#fff}
+.ctrl{background:#ff9800}
+#msg{text-align:center;font-size:28px;height:36px}
+#start{background:#4caf50;font-size:34px}
+</style>
+</head>
+<body><div class="main"><div class="card">
+<div id="intro" style="text-align:center">
+<h1>🌟たしざんチャレンジ🌟</h1>
+<p>10までの たしざん 20もん</p>
+<button id="start">▶ スタート</button>
+<p id="best"></p>
+</div>
+<div id="game" style="display:none">
+<div class="top"><span id="timer">⏱0秒</span><span id="count"></span></div>
+<div id="stars"></div>
+<div id="problem"></div>
+<div id="answer"></div>
+<div class="grid" id="keys"></div>
+<div id="msg"></div>
+</div>
+</div></div>
+<script>
+let all=[];for(let a=0;a<=10;a++)for(let b=0;b<=10-a;b++)all.push({a,b,s:a+b});
+let qs=[],i=0,score=0,input="",tries=0,startTime,timer;
+const $=id=>document.getElementById(id);
+
+function beep(ok){
+ const ctx=new (window.AudioContext||window.webkitAudioContext)();
+ function tone(f,t){let o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=f;o.connect(g);g.connect(ctx.destination);g.gain.value=.08;o.start();o.stop(ctx.currentTime+t);}
+ if(ok){tone(784,.08);setTimeout(()=>tone(1046,.12),90);} // ピンポン風
+ else{tone(220,.2);}
+}
+function shuffle(a){return a.sort(()=>Math.random()-.5)}
+function drawStars(){
+ let s="";
+ for(let n=1;n<=score;n++){
+   s+="⭐";
+   if(n===10)s+="\n";
+ }
+ $("stars").textContent=s;
+ if(score===10){$("msg").textContent="🎉 10もん せいかい！";}
+}
+function makeKeys(){
+ const names=["1","2","3","4","5","6","7","8","9","けす","0","けってい"];
+ $("keys").innerHTML="";
+ names.forEach(t=>{
+   let b=document.createElement("button");
+   b.textContent=t;
+   if(t==="けす"||t==="けってい")b.className="ctrl";
+   b.onclick=()=>press(t);
+   $("keys").appendChild(b);
+ });
+}
+function press(t){
+ if(t==="けす")input=input.slice(0,-1);
+ else if(t==="けってい"){judge();return;}
+ else if(input.length<2)input+=t;
+ $("answer").textContent=input;
+}
+function load(){
+ input="";tries=0;
+ $("answer").textContent="";
+ if(score!==10)$("msg").textContent="";
+ let q=qs[i];
+ $("count").textContent=(i+1)+"/20";
+ $("problem").textContent=`${q.a} ＋ ${q.b} = □`;
+}
+function judge(){
+ if(input==="")return;
+ let q=qs[i];
+ if(Number(input)===q.s){
+   beep(true);
+   score++;drawStars();
+   $("msg").textContent="⭕ せいかい！";
+   setTimeout(next,500);
+ }else{
+   beep(false);
+   tries++;
+   if(tries===1){$("msg").textContent="❌ もういちど";input="";$("answer").textContent="";}
+   else{$("msg").textContent="こたえは "+q.s;setTimeout(next,700);}
+ }
+}
+function next(){
+ i++;
+ if(i>=20){finish();return;}
+ load();
+}
+function finish(){
+ clearInterval(timer);
+ let sec=Math.floor((Date.now()-startTime)/1000);
+ let medal="🥉";
+ if(score===20&&sec<=30)medal="🥇";
+ else if(score>=18&&sec<=45)medal="🥈";
+ let best=localStorage.getItem("best_add20");
+ if(!best||sec<Number(best)){localStorage.setItem("best_add20",sec);best=sec;}
+ $("game").innerHTML=`<h2 style="text-align:center">🎊 パーフェクト！</h2>
+ <div style="font-size:60px;text-align:center">${medal}</div>
+ <p style="text-align:center;font-size:28px">${score}/20せいかい<br>⏱${sec}秒<br>🏆ベスト ${best}秒</p>
+ <div style="text-align:center"><button onclick="location.reload()">もういちど</button></div>`;
+}
+$("start").onclick=()=>{
+ $("intro").style.display="none";$("game").style.display="block";
+ qs=shuffle(all.slice()).slice(0,20);
+ i=0;score=0;drawStars();makeKeys();load();
+ startTime=Date.now();
+ timer=setInterval(()=>$("timer").textContent="⏱"+Math.floor((Date.now()-startTime)/1000)+"秒",1000);
+};
+let b=localStorage.getItem("best_add20");
+$("best").textContent=b?"🏆 ベストタイム "+b+"秒":"🏆 はじめてのチャレンジ";
+</script>
+</body></html>

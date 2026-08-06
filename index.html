@@ -150,8 +150,33 @@ button{
 
 <script>
 
-const seikaiSound =
-new Audio("https://www.soundjay.com/buttons/sounds/button-09.mp3");
+<script>
+
+function playCorrectSound() {
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc.frequency.value = 523;
+
+  osc.start();
+
+  setTimeout(() => {
+    osc.frequency.value = 784;
+  }, 120);
+
+  setTimeout(() => {
+    osc.stop();
+  }, 250);
+}
+
+let total=20;
+let all=[];
+let qs=[];
 
 let total=20;
 let all=[];

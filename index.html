@@ -23,20 +23,8 @@ button{padding:14px;font-size:28px;border:none;border-radius:10px;background:#42
 <body><div class="main"><div class="card">
 <div id="intro" style="text-align:center">
 <h1>🌟たしざんチャレンジ🌟</h1>
-
-<p>もんだいすうをえらぼう！</p>
-
-<div id="course">
-<button class="course" onclick="selectCourse(10,this)">🟢 10もん</button>
-<button class="course" onclick="selectCourse(20,this)">🟡 20もん</button>
-<button class="course active" onclick="selectCourse(20,this)">🟡 20もん</button>
-<button class="course" onclick="selectCourse(30,this)">🔵 30もん</button>
-</div>
-
-<br>
-
+<p>10までの たしざん 20もん</p>
 <button id="start">▶ スタート</button>
-
 <p id="best"></p>
 </div>
 <div id="game" style="display:none">
@@ -51,7 +39,6 @@ button{padding:14px;font-size:28px;border:none;border-radius:10px;background:#42
 <script>
 let all=[];for(let a=0;a<=10;a++)for(let b=0;b<=10-a;b++)all.push({a,b,s:a+b});
 let qs=[],i=0,score=0,input="",tries=0,startTime,timer;
-let questionCount = 20; 
 const $=id=>document.getElementById(id);
 
 function beep(ok){
@@ -139,7 +126,3 @@ let b=localStorage.getItem("best_add20");
 $("best").textContent=b?"🏆 ベストタイム "+b+"秒":"🏆 はじめてのチャレンジ";
 </script>
 </body></html>
-.course{width:180px;
-margin:8px;font-size:26px;background:#42a5f5;}
-
-.active{background:#4CAF50 !important;}
